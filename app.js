@@ -1,16 +1,14 @@
-const MongoClient = require('mongodb').MongoClient;
+const { MongoClient } = require('mongodb');
 const assert = require('assert');
+
+const { url, dbName } = require('./config');
 
 const circulationRepo = require('./repo/circulation');
 const circulationData = require('./data/circulation');
 
-
-const url = 'mongodb://localhost:27017';
-const dbName = 'circulation';
-
 async function main() {
-    const client = new MongoClient(url);
-    await client.connect();
+    const mongoClient = new MongoClient(url);
+    await mongoClient.connect();
 
     try {
         const results = await circulationRepo.loadData(circulationData);
@@ -63,22 +61,18 @@ async function main() {
         assert.equal(removedItem, null);
 
         const avgFinalists = await circulationRepo.averageFinalists();
-        console.log(avgFinalists);
+        // console.log(avgFinalists);
 
         const avgFinalistsByChange = await circulationRepo.averageFinalistsByChange();
-        console.log(avgFinalistsByChange);
+        assert.equal(avgFinalistsByChange.length, 2);
+
+        console.log('*** CRUD operations have been successfully finished! ***')
     } catch (e) {
         console.error(e);
     } finally {
-        // const admin = client.db(dbName).admin();
-        // console.log(await admin.listDatabases());
-
-        await client.db(dbName).dropDatabase();
-        client.close();
+        await mongoClient.db(dbName).dropDatabase();
+        mongoClient.close();
     }
 }
-
-
-
 
 main();
