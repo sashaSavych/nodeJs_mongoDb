@@ -61,11 +61,17 @@ async function main() {
         assert(removedFlag);
         const removedItem = await circulationRepo.getDataById(updatedItem._id);
         assert.equal(removedItem, null);
+
+        const avgFinalists = await circulationRepo.averageFinalists();
+        console.log(avgFinalists);
+
+        const avgFinalistsByChange = await circulationRepo.averageFinalistsByChange();
+        console.log(avgFinalistsByChange);
     } catch (e) {
         console.error(e);
     } finally {
-        const admin = client.db(dbName).admin();
-        console.log(await admin.listDatabases());
+        // const admin = client.db(dbName).admin();
+        // console.log(await admin.listDatabases());
 
         await client.db(dbName).dropDatabase();
         client.close();
